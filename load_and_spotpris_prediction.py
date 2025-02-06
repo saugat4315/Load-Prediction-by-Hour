@@ -80,16 +80,6 @@ forecast_df_rounded.to_csv('load_forecast_next_7_days.csv')
 
 
 
-import pandas as pd
-import numpy as np
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error
-import matplotlib.pyplot as plt
-
-# Load your hourly site load data
-df = pd.read_csv('/content/hourly_site_load_data_rounded.csv', index_col='datetime', parse_dates=True)
-
 # Create features for day, hour, etc., that may help in the prediction
 df['day_of_week'] = df.index.dayofweek
 df['hour'] = df.index.hour
@@ -160,65 +150,3 @@ plt.show()
 
 # Save the rounded forecast data to CSV
 forecast_df_rounded.to_csv('test_load_forecast_next_7_days.csv')
-
-import requests
-import json
-from requests.auth import HTTPBasicAuth
-
-# Function to fetch battery SoC and site load from API
-def fetch_battery_data():
-    url = "https://ems.greenerway.services/api/v1/sites/b36a1513-381c-434a-ae9b-08ea05464ddc/measurements/realtime"
-
-    # Credentials
-    username = "batteri"
-    password = "batteri"
-
-    # GET request to the API using HTTP basic authentication
-    response = requests.get(url, auth=HTTPBasicAuth(username, password))
-
-    # Check if the request was successful
-    if response.status_code == 200:
-        try:
-            data = response.json()
-        except ValueError:
-            print("Response content is not in JSON format.")
-            return None
-
-        # Extract battery SoC and site load
-        battery_soc = data.get('batterySoc')
-        site_load = data.get('siteLoad')
-
-        # Check and print both values if available
-        if battery_soc is not None:
-            print(f"Battery State of Charge: {battery_soc}%")
-        else:
-            print("Battery SoC data not available.")
-
-        if site_load is not None:
-            print(f"Site Load: {site_load} kW")
-        else:
-            print("Site Load data not available.")
-
-        return battery_soc, site_load
-
-    else:
-        print(f"Failed to fetch data. Status code: {response.status_code}")
-        return None, None
-
-# Call the function to fetch and print data
-fetch_battery_data()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
